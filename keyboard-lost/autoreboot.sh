@@ -13,13 +13,28 @@ if [ -z "$1" ]; then
 fi
 # check if the argument is greater than 0
 # if not, exit
-if [ "$1" -le 0 ]; then
-    echo "Usage: $0 <number>"
-    exit 1
+if [ "$1" -eq 0 ]; then
+    echo "Finish testing..."
+    sudo cp /etc/gdm3/custom.conf.bak /etc/gdm3/custom.conf
+    rm -f /home/$USER/.config/autostart/autoreboot.desktop
+    exit 0
 fi
 
 TIMES=$1
 USER=$(whoami)
+
+# change the /etc/gdm3/custom.conf to enable autologin
+# and set the autologin user to the current user
+if [ ! -f "/etc/gdm3/custom.conf.bak" ]; then
+    sudo cp /etc/gdm3/custom.conf /etc/gdm3/custom.conf.bak
+fi
+# check if the autologin is enabled or not
+if ! grep -q '^AutomaticLoginEnable = true' /etc/gdm3/custom.conf; then
+    echo "Autologin is not enabled"
+    sudo sed -i "s/#  AutomaticLoginEnable = true/AutomaticLoginEnable = true/g" /etc/gdm3/custom.conf
+    sudo sed -i "s/#  AutomaticLogin = user1/AutomaticLogin = ${USER}/g" /etc/gdm3/custom.conf
+fi
+
 # copy this script into the home directory
 if [ ! -f "/home/$USER/autoreboot.sh" ]; then
     cp $0 /home/$USER/autoreboot.sh
@@ -65,9 +80,10 @@ if journalctl | grep -q 'Elan TrackPoint'; then
     echo "Elan TrackPoint is still there"
 else
     echo "Elan TrackPoint is gone"
+    rm -f /home/$USER/.config/autostart/autoreboot.desktop
     exit 1
 fi
 echo "Rebooting... $TIMES"
-sleep 10
+sleep 5
 reboot
 # End of autoreboot.sh
