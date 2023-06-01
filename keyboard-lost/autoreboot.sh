@@ -76,11 +76,11 @@ fi
 
 sed -i "s/autoreboot.sh $TIMES/autoreboot.sh $(( $TIMES - 1 ))/g" /home/$USER/.config/autostart/autoreboot.desktop
 
-if journalctl | grep -q 'Elan TrackPoint'; then
+if journalctl -b 0 | grep -q 'Elan TrackPoint'; then
     echo "Elan TrackPoint is still there"
 else
-    echo "Elan TrackPoint is gone"
-    rm -f /home/$USER/.config/autostart/autoreboot.desktop
+    echo "Elan TrackPoint is gone, please debug it!!"
+    #rm -f /home/$USER/.config/autostart/autoreboot.desktop
     exit 1
 fi
 echo "Rebooting... $TIMES"
