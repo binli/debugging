@@ -1,7 +1,7 @@
 #!/bin/bash
 # autoreboot.sh
 # automatically reboot the system 30 times
-# and check journalctl's result if there is 'Elan TrackPoint' in the output
+# and check journalctl's result if there is 'TrackPoint' in the output
 #
 # Usage:
 #  ./autoreboot.sh 30
@@ -64,11 +64,23 @@ fi
 # if the reboot times is 0, remove the autostart file
 # and exit
 # if the reboot times is not 0, reboot the system
-# and check journalctl's result if there is 'Elan TrackPoint' in the output
+# and check journalctl's result if there is
+# 'Elan TrackPoint' or 'Synaptics TrackPoint' in the output
 # if there is, exit
 # if not, continue
 # after reboot, the autostart file will be executed again
 # and the reboot times will be decreased by 1
+#
+# journalctl's log.
+# kernel: psmouse serio2: trackpoint: Elan TrackPoint firmware: 0x11, buttons: 3/3
+#
+# Kernel source code in drivers/input/mouse/trackpoint.c
+#
+# psmouse_info(psmouse,
+#   "%s TrackPoint firmware: 0x%02x, buttons: %d/%d\n",
+#   psmouse->vendor, firmware_id,
+#   (button_info & 0xf0) >> 4, button_info & 0x0f);
+
 if [ "$TIMES" -eq 0 ]; then
     rm -f /home/$USER/.config/autostart/autoreboot.desktop
     exit 0
@@ -76,13 +88,16 @@ fi
 
 sed -i "s/autoreboot.sh $TIMES/autoreboot.sh $(( $TIMES - 1 ))/g" /home/$USER/.config/autostart/autoreboot.desktop
 
-if journalctl -b 0 | grep -q 'Elan TrackPoint'; then
-    echo "Elan TrackPoint is still there"
-else
-    echo "Elan TrackPoint is gone, please debug it!!"
+vendor=$(journalctl -b 0 | grep -oe '[A-Za-z0-9]* TrackPoint firmware')
+
+if [ -z "$vendor" ]; then
+    echo "TrackPoint is gone, please debug it!!"
     #rm -f /home/$USER/.config/autostart/autoreboot.desktop
     exit 1
+else
+    echo "$vendor is loaded successfully"
 fi
+
 echo "Rebooting... $TIMES"
 sleep 5
 reboot
