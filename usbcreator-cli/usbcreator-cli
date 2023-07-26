@@ -1,0 +1,36 @@
+#!/bin/bash
+#usbcreator-cli
+
+set -x
+
+ISOFILE=$1
+if [ -z "$ISOFILE" ]; then
+    echo "Usage: $0 <iso file>"
+    exit 1
+fi
+
+# Check if the USB device is inserted or mounted, currently only supports sd devices.
+SD1=`mount | grep -q "sd[a-z][0-9] on /media" | grep -q "type vfat" | awk '{print $1}'`
+echo "$SD1"
+# Check how many partitions are on the USB device
+
+# check the vfat disk size if it is less than 6GB
+
+# Prompt the user to format the USB device
+
+# Format the USB device
+#
+
+# Clean the USB device
+#rm -rf $SD1/*
+
+exit 0
+
+# Mount the ISO file to a temp dir and then copy the ISO file to the USB device
+TMPDIR=`mktemp`
+sudo mount -o loop $ISOFILE $TMPDIR
+cp -r $TMPDIR/* $SD1
+cp -r $TMPDIR/. $SD1
+
+sudo umount $TMPDIR
+rm -rf $TMPDIR
