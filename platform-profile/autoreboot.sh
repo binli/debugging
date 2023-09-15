@@ -20,6 +20,12 @@ if [ "$1" -eq 0 ]; then
     exit 0
 fi
 
+if [ -z "$2" ]; then
+    sleep_in_seconds=5
+else
+    sleep_in_seconds=$2
+fi
+
 TIMES=$1
 USER=$(whoami)
 
