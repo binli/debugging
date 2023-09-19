@@ -5,19 +5,19 @@
 From below link or the one from the your kernel source.
 
 ```bash
-#curl -s https://raw.githubusercontent.com/torvalds/linux/master/drivers/platform/x86/thinkpad_acpi.c > thinkpad_acpi.c
-#curl -s https://raw.githubusercontent.com/torvalds/linux/master/drivers/platform/x86/dual_accel_detect.h > dual_accel_detect.h
+curl -s https://raw.githubusercontent.com/torvalds/linux/master/drivers/platform/x86/thinkpad_acpi.c > thinkpad_acpi.c
+curl -s https://raw.githubusercontent.com/torvalds/linux/master/drivers/platform/x86/dual_accel_detect.h > dual_accel_detect.h
 ```
 
 ### Compile the thinkpad_acpi.
 ```bash
-$ make
-$ sudo modprobe -r thinkpad_acpi
-$ sudo insmod thinkpad_acpi.ko
-$ sudo dmesg | tail -n 40
+make
+sudo modprobe -r thinkpad_acpi
+sudo insmod thinkpad_acpi.ko
+sudo dmesg | tail -n 40
 ```
 
 ### clean the thinkpad_acpi.
 ```
-$ make clean
+make clean
 ```
