@@ -5,6 +5,10 @@
 #
 KVER?= $(shell uname -r)
 
+# Enable pr_debug() with one of below methods
+CFLAGS_thinkpad_acpi.o := -DDEBUG
+#EXTRA_CFLAGS += -DDEBUG
+
 obj-$(CONFIG_THINKPAD_ACPI)	+= thinkpad_acpi.o
 
 all:
