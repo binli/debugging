@@ -1,0 +1,93 @@
+--- /source/lps/linux-oem.jammy/drivers/platform/x86/thinkpad_acpi.c	2023-07-25 15:00:50.000000000 +0800
++++ thinkpad_acpi.6.1.c	2023-09-20 18:36:32.812969413 +0800
+@@ -10329,6 +10329,7 @@
+ {
+ 	switch (funcmode) {
+ 	case DYTC_FUNCTION_MMC:
++		dbg_printk(TPACPI_DBG_INIT, "DYTC MMC %d\n", dytcmode);
+ 		switch (dytcmode) {
+ 		case DYTC_MODE_MMC_LOWPOWER:
+ 			*profile = PLATFORM_PROFILE_LOW_POWER;
+@@ -10345,6 +10346,7 @@
+ 		}
+ 		return 0;
+ 	case DYTC_FUNCTION_PSC:
++		dbg_printk(TPACPI_DBG_INIT, "DYTC PSC %d\n", dytcmode);
+ 		switch (dytcmode) {
+ 		case DYTC_MODE_PSC_LOWPOWER:
+ 			*profile = PLATFORM_PROFILE_LOW_POWER;
+@@ -10360,13 +10362,16 @@
+ 		}
+ 		return 0;
+ 	case DYTC_FUNCTION_AMT:
++		dbg_printk(TPACPI_DBG_INIT, "DYTC AMT %d\n", dytcmode);
+ 		/* For now return balanced. It's the closest we have to 'auto' */
+ 		*profile =  PLATFORM_PROFILE_BALANCED;
+ 		return 0;
+ 	default:
++		dbg_printk(TPACPI_DBG_INIT, "DYTC NOT FIND FUNCTION\n");
+ 		/* Unknown function */
+ 		return -EOPNOTSUPP;
+ 	}
++	dbg_printk(TPACPI_DBG_INIT, "DYTC convert file return 0\n");
+ 	return 0;
+ }
+ 
+@@ -10541,7 +10546,9 @@
+ 	} else if (dytc_capabilities & BIT(DYTC_FC_PSC)) {
+ 		err = dytc_command(DYTC_CMD_GET, &output);
+ 		/* Check if we are PSC mode, or have AMT enabled */
++		dbg_printk(TPACPI_DBG_INIT, "DYTC profile output 0x%08x\n", output);
+ 		funcmode = (output >> DYTC_GET_FUNCTION_BIT) & 0xF;
++		dbg_printk(TPACPI_DBG_INIT, "DYTC profile funcmode 0x%08x\n", funcmode);
+ 	} else { /* Unknown profile mode */
+ 		err = -ENODEV;
+ 	}
+@@ -10549,8 +10556,11 @@
+ 	if (err)
+ 		return;
+ 
++	dbg_printk(TPACPI_DBG_INIT, "DYTC profile output 0x%08x\n", output);
+ 	perfmode = (output >> DYTC_GET_MODE_BIT) & 0xF;
++	dbg_printk(TPACPI_DBG_INIT, "DYTC profile perfmode 0x%08x\n", perfmode);
+ 	convert_dytc_to_profile(funcmode, perfmode, &profile);
++	dbg_printk(TPACPI_DBG_INIT, "DYTC profile %d\n", profile);
+ 	if (profile != dytc_current_profile) {
+ 		dytc_current_profile = profile;
+ 		platform_profile_notify();
+@@ -10564,7 +10574,7 @@
+ 
+ static int tpacpi_dytc_profile_init(struct ibm_init_struct *iibm)
+ {
+-	int err, output;
++	int err, output = 0;
+ 
+ 	/* Setup supported modes */
+ 	set_bit(PLATFORM_PROFILE_LOW_POWER, dytc_profile.choices);
+@@ -10575,6 +10585,7 @@
+ 	if (err)
+ 		return err;
+ 
++	dbg_printk(TPACPI_DBG_INIT, "DYTC QUERY output 0x%08x\n", output);
+ 	if (output & BIT(DYTC_QUERY_ENABLE_BIT))
+ 		dytc_version = (output >> DYTC_QUERY_REV_BIT) & 0xF;
+ 
+@@ -10587,8 +10598,10 @@
+ 	if (err)
+ 		return err;
+ 
++	dbg_printk(TPACPI_DBG_INIT, "DYTC CAP output 0x%08x\n", dytc_capabilities);
+ 	/* Check if user wants to override the profile selection */
+ 	if (profile_force) {
++		dbg_printk(TPACPI_DBG_INIT, "DYTC profile_force %d\n", profile_force);
+ 		switch (profile_force) {
+ 		case -1:
+ 			dytc_capabilities = 0;
+@@ -10602,6 +10615,7 @@
+ 		}
+ 		pr_debug("Profile selection forced: 0x%x\n", dytc_capabilities);
+ 	}
++	dbg_printk(TPACPI_DBG_INIT, "DYTC MMC BIT 0x%08x\n", BIT(DYTC_FC_MMC));
+ 	if (dytc_capabilities & BIT(DYTC_FC_MMC)) { /* MMC MODE */
+ 		pr_debug("MMC is supported\n");
+ 		/*
