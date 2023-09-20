@@ -7,7 +7,6 @@ KVER?= $(shell uname -r)
 
 obj-$(CONFIG_THINKPAD_ACPI)	+= thinkpad_acpi.o
 
-# added for Sutton DKMS
 all:
 	make -C /lib/modules/$(KVER)/build M=$(shell pwd) modules
 clean:

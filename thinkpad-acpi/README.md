@@ -1,4 +1,4 @@
-### Enable debug mode for thinkpad_acpi.
+### Enable debug mode for thinkpad_acpi
 ./debug.sh
 
 ### Get the latest thinkpad_acpi
@@ -9,15 +9,15 @@ curl -s https://raw.githubusercontent.com/torvalds/linux/master/drivers/platform
 curl -s https://raw.githubusercontent.com/torvalds/linux/master/drivers/platform/x86/dual_accel_detect.h > dual_accel_detect.h
 ```
 
-### Compile the thinkpad_acpi.
+### Compile the thinkpad_acpi and load it
 ```bash
 make
-sudo modprobe -r thinkpad_acpi
+sudo rmmod thinkpad_acpi
 sudo insmod thinkpad_acpi.ko
 sudo dmesg | tail -n 40
 ```
 
-### clean the thinkpad_acpi.
+### clean the thinkpad_acpi
 ```
 make clean
 ```
