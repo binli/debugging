@@ -1,4 +1,5 @@
 $ snap prepare-image --classic /var/lib/snapd/assertions/asserts-v0/model/16/generic/generic-classic/active --channel=stable/ubuntu-20.04 --arch=amd64 --snap snap-store --snap chromium /home/u/a
+$ snap prepare-image --classic /var/lib/snapd/assertions/asserts-v0/model/16/generic/generic-classic/active --channel=stable/ubuntu-20.04 --arch=amd64 --snap core=stable --snap core22=stable --snap bare=stable --snap gtk-common-themes --snap gnome-42-2204=stable --snap snap-store --snap cups=stable --snap chromium --snap snapd=stable a
 
 $ cat /var/lib/snapd/assertions/asserts-v0/model/16/generic/generic-classic/active
 type: model
