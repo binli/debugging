@@ -1,0 +1,107 @@
+diff --git a/thinkpad-acpi/thinkpad_acpi.c b/thinkpad-acpi/thinkpad_acpi.c
+index 03316d3..b6f38d1 100644
+--- a/thinkpad-acpi/thinkpad_acpi.c
++++ b/thinkpad-acpi/thinkpad_acpi.c
+@@ -10267,6 +10267,7 @@ static int convert_dytc_to_profile(int funcmode, int dytcmode,
+ {
+ 	switch (funcmode) {
+ 	case DYTC_FUNCTION_MMC:
++		dbg_printk(TPACPI_DBG_INIT, "DYTC MMC %d\n", dytcmode);
+ 		switch (dytcmode) {
+ 		case DYTC_MODE_MMC_LOWPOWER:
+ 			*profile = PLATFORM_PROFILE_LOW_POWER;
+@@ -10283,6 +10284,7 @@ static int convert_dytc_to_profile(int funcmode, int dytcmode,
+ 		}
+ 		return 0;
+ 	case DYTC_FUNCTION_PSC:
++		dbg_printk(TPACPI_DBG_INIT, "DYTC PSC %d\n", dytcmode);
+ 		switch (dytcmode) {
+ 		case DYTC_MODE_PSC_LOWPOWER:
+ 			*profile = PLATFORM_PROFILE_LOW_POWER;
+@@ -10298,13 +10300,16 @@ static int convert_dytc_to_profile(int funcmode, int dytcmode,
+ 		}
+ 		return 0;
+ 	case DYTC_FUNCTION_AMT:
++		dbg_printk(TPACPI_DBG_INIT, "DYTC AMT %d\n", dytcmode);
+ 		/* For now return balanced. It's the closest we have to 'auto' */
+ 		*profile =  PLATFORM_PROFILE_BALANCED;
+ 		return 0;
+ 	default:
++		dbg_printk(TPACPI_DBG_INIT, "DYTC NOT FIND FUNCTION\n");
+ 		/* Unknown function */
+ 		return -EOPNOTSUPP;
+ 	}
++	dbg_printk(TPACPI_DBG_INIT, "DYTC convert file return 0\n");
+ 	return 0;
+ }
+ 
+@@ -10479,7 +10484,9 @@ static void dytc_profile_refresh(void)
+ 	} else if (dytc_capabilities & BIT(DYTC_FC_PSC)) {
+ 		err = dytc_command(DYTC_CMD_GET, &output);
+ 		/* Check if we are PSC mode, or have AMT enabled */
++		dbg_printk(TPACPI_DBG_INIT, "DYTC profile output 0x%08x\n", output);
+ 		funcmode = (output >> DYTC_GET_FUNCTION_BIT) & 0xF;
++		dbg_printk(TPACPI_DBG_INIT, "DYTC profile funcmode 0x%08x\n", funcmode);
+ 	} else { /* Unknown profile mode */
+ 		err = -ENODEV;
+ 	}
+@@ -10487,8 +10494,11 @@ static void dytc_profile_refresh(void)
+ 	if (err)
+ 		return;
+ 
++	dbg_printk(TPACPI_DBG_INIT, "DYTC profile output 0x%08x\n", output);
+ 	perfmode = (output >> DYTC_GET_MODE_BIT) & 0xF;
++	dbg_printk(TPACPI_DBG_INIT, "DYTC profile perfmode 0x%08x\n", perfmode);
+ 	convert_dytc_to_profile(funcmode, perfmode, &profile);
++	dbg_printk(TPACPI_DBG_INIT, "DYTC profile %d\n", profile);
+ 	if (profile != dytc_current_profile) {
+ 		dytc_current_profile = profile;
+ 		platform_profile_notify();
+@@ -10502,7 +10512,7 @@ static struct platform_profile_handler dytc_profile = {
+ 
+ static int tpacpi_dytc_profile_init(struct ibm_init_struct *iibm)
+ {
+-	int err, output;
++	int err, output = 0;
+ 
+ 	/* Setup supported modes */
+ 	set_bit(PLATFORM_PROFILE_LOW_POWER, dytc_profile.choices);
+@@ -10513,6 +10523,7 @@ static int tpacpi_dytc_profile_init(struct ibm_init_struct *iibm)
+ 	if (err)
+ 		return err;
+ 
++	dbg_printk(TPACPI_DBG_INIT, "DYTC QUERY output 0x%08x\n", output);
+ 	if (output & BIT(DYTC_QUERY_ENABLE_BIT))
+ 		dytc_version = (output >> DYTC_QUERY_REV_BIT) & 0xF;
+ 
+@@ -10525,8 +10536,10 @@ static int tpacpi_dytc_profile_init(struct ibm_init_struct *iibm)
+ 	if (err)
+ 		return err;
+ 
++	dbg_printk(TPACPI_DBG_INIT, "DYTC CAP output 0x%08x\n", dytc_capabilities);
+ 	/* Check if user wants to override the profile selection */
+ 	if (profile_force) {
++		dbg_printk(TPACPI_DBG_INIT, "DYTC profile_force %d\n", profile_force);
+ 		switch (profile_force) {
+ 		case -1:
+ 			dytc_capabilities = 0;
+@@ -10540,6 +10553,7 @@ static int tpacpi_dytc_profile_init(struct ibm_init_struct *iibm)
+ 		}
+ 		pr_debug("Profile selection forced: 0x%x\n", dytc_capabilities);
+ 	}
++	dbg_printk(TPACPI_DBG_INIT, "DYTC MMC BIT 0x%08x\n", BIT(DYTC_FC_MMC));
+ 	if (dytc_capabilities & BIT(DYTC_FC_MMC)) { /* MMC MODE */
+ 		pr_debug("MMC is supported\n");
+ 		/*
+@@ -10575,8 +10589,10 @@ static int tpacpi_dytc_profile_init(struct ibm_init_struct *iibm)
+ 	dytc_profile_refresh();
+ 
+ 	/* Workaround for https://bugzilla.kernel.org/show_bug.cgi?id=216347 */
+-	if (dytc_capabilities & BIT(DYTC_FC_PSC))
++	if (dytc_capabilities & BIT(DYTC_FC_PSC)) {
++	        dbg_printk(TPACPI_DBG_INIT, "DYTC_FC_PSC is enabled\n");
+ 		dytc_profile_set(NULL, PLATFORM_PROFILE_BALANCED);
++        }
+ 
+ 	return 0;
+ }
