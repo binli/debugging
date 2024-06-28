@@ -3,7 +3,7 @@
 # automatically reboot the system to check sth from backend script
 #
 # Usage:
-#  ./autoreboot.sh vblank-wait/backend.sh 30
+#  ./autoreboot.sh 30 vblank-wait/backend.sh
 
 USER=$(whoami)
 
