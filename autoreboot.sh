@@ -32,6 +32,7 @@ function quit_reboot() {
     if [ -f "/home/$USER/$BACKEND" ]; then
         rm -f /home/$USER/$BACKEND
     fi
+    rm -f /home/$USER/autoreboot_times.txt
     exit 0
 }
 
@@ -54,6 +55,12 @@ fi
 # if not, exit
 if [ "$TIMES" -eq 0 ]; then
     echo "Finish testing..."
+    if [ -f failrate.txt ]; then
+        failrate=$(cat failrate.txt)
+        total=$(cat /home/$USER/autoreboot_times.txt)
+        echo "Fail rate: $failrate / $total"
+        rm -f failrate.txt
+    fi
     quit_reboot
 fi
 
@@ -77,6 +84,7 @@ Name=autoreboot
 Comment=autoreboot
 EOF
     echo "First rebooting..."
+    echo "$TIMES" > /home/$USER/autoreboot_times.txt
     sleep 1
     reboot
     exit 0
