@@ -96,6 +96,5 @@ fi
 
 sleep 3
 # warm boot or cold boot with rtcwake
-sudo reboot
-#sudo rtcwake -m off -s 30
+sudo rtcwake -m off -s 30
 exit 0
