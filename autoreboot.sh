@@ -41,16 +41,9 @@ if [ -z "$1" ]; then
     echo "Usage: $0 <number> <backend script>"
     exit 1
 fi
-TIMES=$1
-if [ -z "$TIMES" ]; then
-    echo "Usage: $0 <number> <backend script>"
-    exit 1
-fi
+TIMES=$1{1:-30}
 BACKEND=$2
-if [ ! -x "$BACKEND" ]; then
-    echo "The backend script does not exist or is not executable!!"
-    exit 1
-fi
+
 # check if the argument is greater than 0
 # if not, exit
 if [ "$TIMES" -eq 0 ]; then
@@ -93,14 +86,15 @@ fi
 # decrease the reboot times by 1
 sed -i "s/autoreboot.sh $TIMES/autoreboot.sh $(( $TIMES - 1 ))/g" /home/$USER/.config/autostart/autoreboot.desktop
 echo "Rebooting... $TIMES"
-echo "Call backend script: $BACKEND"
-# get the backend return value
-# if the return value is not 0, exit for debugging
-# if the return value is 0, reboot the system
-/home/$USER/$BACKEND
-if [ "$?" -ne 0 ]; then
-    quit_reboot
+if [ -x "$BACKEND" ]; then
+    echo "Call backend script: $BACKEND"
+    # get the backend return value
+    # if the return value is not 0, exit for debugging
+    # if the return value is 0, reboot the system
+    /home/$USER/$BACKEND
 fi
+
 sleep 3
-reboot
+#reboot
+sudo rtcwake -m off -s 10
 exit 0
