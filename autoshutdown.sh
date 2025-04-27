@@ -41,7 +41,7 @@ if [ -z "$1" ]; then
     echo "Usage: $0 <number> <backend script>"
     exit 1
 fi
-TIMES=$1{1:-30}
+TIMES=$1
 BACKEND=$2
 
 # check if the argument is greater than 0
