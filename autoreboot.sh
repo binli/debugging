@@ -33,6 +33,9 @@ function quit_reboot() {
         rm -f /home/$USER/$BACKEND
     fi
     rm -f /home/$USER/autoreboot_times.txt
+    if [ -f /etc/sudoers.d/autoreboot ]; then
+        sudo rm -f /etc/sudoers.d/autoreboot
+    fi
     exit 0
 }
 
@@ -43,6 +46,11 @@ if [ -z "$1" ]; then
 fi
 TIMES=$1
 BACKEND=$2
+
+# Enable the sudo without password
+if ! -e /etc/sudoers.d/autoreboot; then
+    echo "%sudo ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee -a /etc/sudoers.d/autoreboot > /dev/null
+fi
 
 # check if the argument is greater than 0
 # if not, exit
