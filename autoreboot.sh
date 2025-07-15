@@ -48,7 +48,7 @@ TIMES=$1
 BACKEND=$2
 
 # Enable the sudo without password
-if ! -e /etc/sudoers.d/autoreboot; then
+if [ ! -e /etc/sudoers.d/autoreboot ]; then
     echo "%sudo ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee -a /etc/sudoers.d/autoreboot > /dev/null
 fi
 
