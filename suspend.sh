@@ -11,12 +11,16 @@ for ((i=1; i<=TOTAL_SUSPENDS; i++)); do
     echo "Woke up from suspend #$i"
     if [ -x "$BACKEND" ]; then
         echo "Call backend script: $BACKEND"
-        # get the backend return value
-        # if the return value is not 0, exit for debugging
-        # if the return value is 0, reboot the system
-        /home/$USER/$BACKEND
+
+        ./$BACKEND
+        if [ $? -ne 0 ]; then
+            echo "Backend script $BACKEND returned non-zero exit code. Exiting for debugging."
+            exit 1
+        else
+            echo "Backend script $BACKEND executed successfully."
+        fi
     fi
-    sleep 2  # Brief pause to avoid overwhelming the system
+    sleep 3  # Brief pause to avoid overwhelming the system
 done
 
 echo "Completed $TOTAL_SUSPENDS suspends."
