@@ -9,5 +9,13 @@ if [ ! -c "$video0" ]; then
     echo "$video0 does not exist!"
     exit 1
 else
+    # check if the snapshot is segmented
+    pid=$(pidof "snapshot")
+    if [ -n "$pid" ]; then
+        echo "snapshot is running with PID $pid"
+    else
+        echo "start snapshot!"
+        /usr/bin/snapshot &
+    fi
     exit 0
 fi
