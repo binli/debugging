@@ -7,6 +7,22 @@
 
 USER=$(whoami)
 
+# Desktop autostart launches this script without a terminal.  Re-exec it in
+# the available terminal emulator so output remains visible across GNOME releases.
+if [ "$1" = "--terminal" ]; then
+    shift
+    if command -v ptyxis > /dev/null 2>&1; then
+        exec ptyxis --standalone -- /bin/bash -c '"$@"; exec bash' bash "$0" "$@"
+    elif command -v gnome-terminal > /dev/null 2>&1; then
+        exec gnome-terminal --maximize -- /bin/bash -c '"$@"; exec bash' bash "$0" "$@"
+    elif command -v x-terminal-emulator > /dev/null 2>&1; then
+        exec x-terminal-emulator -e /bin/bash -c '"$@"; exec bash' bash "$0" "$@"
+    else
+        echo "No supported terminal emulator found." >&2
+        exit 1
+    fi
+fi
+
 # the func to check autologin
 function enable_autologin() {
     # only effect on the default custom.conf file
@@ -69,7 +85,7 @@ if [ ! -f "/home/$USER/.config/autostart/autoreboot.desktop" ]; then
     cat <<EOF | tee /home/$USER/.config/autostart/autoreboot.desktop > /dev/null
 [Desktop Entry]
 Type=Application
-Exec=/usr/bin/gnome-terminal --maximize -- /bin/bash -c "cd /home/$USER ; ./autoreboot.sh $TIMES ${BACKEND##*/} ; exec bash"
+Exec=/home/$USER/autoreboot.sh --terminal $TIMES ${BACKEND##*/}
 Hidden=false
 NoDisplay=false
 X-GNOME-Autostart-enabled=true
