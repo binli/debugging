@@ -7,7 +7,7 @@ BACKEND=$2
 # Loop to suspend 30 times
 for ((i=1; i<=TOTAL_SUSPENDS; i++)); do
     echo "Suspend #$i of $TOTAL_SUSPENDS starting..."
-    sudo rtcwake -m no -s 20
+    sudo rtcwake -m no -s 30
     sudo systemctl suspend
     echo "Woke up from suspend #$i"
     if [ -x "$BACKEND" ]; then
@@ -21,7 +21,7 @@ for ((i=1; i<=TOTAL_SUSPENDS; i++)); do
             echo "Backend script $BACKEND executed successfully."
         fi
     fi
-    sleep 3  # Brief pause to avoid overwhelming the system
+    sleep 10  # Brief pause to avoid overwhelming the system
 done
 
 echo "Completed $TOTAL_SUSPENDS suspends."
