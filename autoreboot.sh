@@ -108,7 +108,7 @@ EOF
 fi
 
 # decrease the reboot times by 1
-sed -i "s/autoreboot.sh --terminal $TIMES/autoreboot.sh --termianl $(( $TIMES - 1 ))/g" /home/$USER/.config/autostart/autoreboot.desktop
+sed -i "s/autoreboot.sh --terminal $TIMES/autoreboot.sh --terminal $(( $TIMES - 1 ))/g" /home/$USER/.config/autostart/autoreboot.desktop
 echo "Rebooting... $TIMES"
 if [ -x "$BACKEND" ]; then
     echo "Call backend script: $BACKEND"
