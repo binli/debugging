@@ -84,9 +84,18 @@ if [ ! -f "$AUTOSTART" ]; then
         exit 1
     fi
     mkdir -p -- "$RUN_DIR" || exit 1
-    if ! cp -- "$0" "$RUN_DIR/autoshutdown.sh" || ! cp -- "$BACKEND" "$RUN_DIR/backend.sh"; then
-        rm -f -- "$RUN_DIR/autoshutdown.sh" "$RUN_DIR/backend.sh"
+    if ! cp -- "$0" "$RUN_DIR/autoshutdown.sh" ; then
+        echo "Failed to copy autoshutdown.sh to run directory: $RUN_DIR" >&2
         exit 1
+    fi
+    if [ ! -z "$BACKEND" ]; then
+        if ! cp -- "$BACKEND" "$RUN_DIR/backend.sh"; then
+            echo "Failed to copy backend script: $BACKEND" >&2
+            exit 1
+        fi
+        if [ ! -x "$RUN_DIR/backend.sh" ]; then
+            chmod +x "$RUN_DIR/backend.sh" || exit 1
+        fi
     fi
     enable_autologin || exit 1
     mkdir -p -- "$HOME/.config/autostart" || exit 1
