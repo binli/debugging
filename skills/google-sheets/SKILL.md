@@ -1,6 +1,10 @@
 ---
 name: Google Sheets
 description: Read Google spreadsheet tabs and cell ranges, export spreadsheet contents to JSON files, or update specific cells through the Google Sheets API.
+version: 1.0.0
+author: Li Bin (binli)
+license: MIT
+platforms: [linux]
 ---
 
 # Google Sheets
