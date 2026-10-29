@@ -2,13 +2,9 @@
 name: lp-bot
 description: Query Launchpad bugs, tasks, comments, and attachments via high-speed REST API.
 version: 1.2.0
-author: Li Bin (binli), Copilot, Hermes Agent
+author: Li Bin (binli)
 license: MIT
-platforms: [linux, macos]
-metadata:
-  hermes:
-    tags: [launchpad, canonical, bugs, attachments, sru, template, rest, tags]
-    related_skills: [document-to-action-items]
+platforms: [linux]
 ---
 
 # Launchpad-Bot Skill

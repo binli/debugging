@@ -2,13 +2,9 @@
 name: jira-bot
 description: Create and query Jira tickets, comments, attachments, and Launchpad bug links via Jira API.
 version: 1.1.0
-author: Li Bin (binli), Copilot, Hermes Agent
+author: Li Bin (binli)
 license: MIT
-platforms: [linux, macos]
-metadata:
-  hermes:
-    tags: [jira, canonical, tickets, attachments, warthogs, comments, launchpad]
-    related_skills: [document-to-action-items]
+platforms: [linux]
 ---
 
 # Jira-Bot Skill
