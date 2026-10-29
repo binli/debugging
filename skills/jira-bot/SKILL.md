@@ -1,7 +1,7 @@
 ---
 name: jira-bot
 description: Create and query Jira tickets, comments, attachments, and Launchpad bug links via Jira API.
-version: 1.0.0
+version: 1.1.0
 author: Li Bin (binli), Copilot, Hermes Agent
 license: MIT
 platforms: [linux, macos]
@@ -34,6 +34,38 @@ Dependencies:
 - Python 3 with `requests` library installed.
 
 Before a write operation, check the cached helper's `--help` output; do not assume it has the latest flags.
+
+## Helper Selection
+
+- Use `python3 ~/.cache/oem-scripts/jira.py` for supported operations, including period searches.
+- Prefer the helper's compact search output over ad hoc REST requests.
+- If an operation is not supported, reading the entire helper source and try to add a new function to the helper rather than using a different tool.
+
+## Searching Issues by Period
+
+Use the read-only `--search` mode to list issues created or updated during a lookback period:
+
+```bash
+# SUTTON issues created OR updated in the preceding seven days
+python3 ~/.cache/oem-scripts/jira.py --search --project SUTTON --period 7d
+
+# The same search, restricted to Bin Li, with compact JSON output
+python3 ~/.cache/oem-scripts/jira.py --search --project SUTTON --period 7d --assignee "Bin Li" --json
+
+# Only issues created in the preceding two weeks
+python3 ~/.cache/oem-scripts/jira.py --search --project SUTTON --period 2w --date-field created
+```
+
+- `--project` defaults to `sutton`.
+- `--period` defaults to `7d`. Use a positive integer followed by `m` (minutes), `h` (hours), `d` (days), or `w` (weeks), such as `30m`, `12h`, or `2w`. For a negative-form argument, use `--period=-7d`.
+- `--date-field` accepts `created`, `updated`, or `either` (default). `either` means `created >= -<period> OR updated >= -<period>`, not AND.
+- `--assignee` optionally filters by exact display name (case-insensitive), account ID, or a known alias such as `binli`. Use `Unassigned` for tickets without an assignee. Filtering is performed locally on the search results.
+- Results include all pages, ordered by most recently updated first, with only `id`, `title`, and `assignee`. `id` is the ticket key (for example, `SUTTON-6350`), not Jira's internal numeric ID.
+- Default output is tab-separated with an `ID`, `Title`, and `Assignee` header. `--json` returns a compact JSON array; no matches returns `[]`.
+- Python callers can use `Jira.search_period(project, period="7d", date_field="either", assignee=None)` to receive the same compact records.
+- Do not combine `--search` with ticket inspection, creation, comments, Bug Link updates, or attachment operations.
+
+For issue lists, use this compact mode rather than fetching full ticket details. Fetch individual tickets only when additional fields are requested. Derive counts from the returned records instead of estimating them.
 
 ## Creating an Issue
 Check the project and component with `Jira.get_components(project)` and search for an existing ticket before filing a new one.
